@@ -187,3 +187,277 @@ static int findLength(const string &str)
 
     return maxLen;
 }
+
+// Longest Substring with Same Letters after Replacement(hard)
+// Problem: Given a string with lowercase letters only, if you are allowed to replace no more than k letters with any letter, find the length of the longest substring having the same letters after replacement.
+// Example 1
+// Input: String="aabccbb", k=2
+// Output: 5
+// Explanation: Replace the two 'c' with 'b' to have the longest repeating substring "bbbbb".
+// Example 2
+// Input: String="abbcb", k=1
+// Output: 4
+// Explanation: Replace the 'c' with 'b' to have the longest repeating substring "bbbb".
+// Example 3
+// Input: String="abccde", k=1
+// Output: 3
+// Explanation: Replace the 'b' or 'd' with 'c' to have the longest repeating substring "ccc".
+static int findLength(const string &str, int k)
+{
+    int windowStart = 0;
+    int maxLen = 0;
+    int maxRepeat = 0;
+    unordered_map<char, int> charCount;
+    for (int windowEnd = 0; windowEnd < str.size(); windowEnd++)
+    {
+        char rightChar = str[windowEnd];
+        charCount[rightChar]++;
+
+        // calculate repeating character
+        maxRepeat = max(maxRepeat, charCount[rightChar]);
+
+        if (windowEnd - windowStart + 1 - maxRepeat > k)
+        {
+            char leftChar = str[windowStart];
+            charCount[leftChar]--;
+            windowStart++;
+        }
+
+        maxLen = max(maxLen, windowEnd - windowStart + 1);
+    }
+
+    return maxLen;
+}
+
+// Longest Subarray with Ones after Replacement(hard)
+// Problem : Given an array containing 0s and 1s, if you are allowed to replace no more than ‘k’ 0s with 1s, find the length of the longest contiguous subarray having all 1s.
+// Example 1
+// Input: Array=[0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1], k=2
+// Output: 6
+// Explanation: Replace the '0' at index 5 and 8 to have the longest contiguous subarray of 1s having length 6.
+// Example 2
+// Input: Array=[0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1], k=3
+// Output: 9
+// Explanation: Replace the '0' at index 6, 9, and 10 to have the longest contiguous subarray of 1s having length 9.
+static int findLength(const vector<int> &arr, int k)
+{
+    int windowStart = 0;
+    int maxLen = 0;
+    int maxOnes = 0;
+    for (int windowEnd = 0; windowEnd < arr.size(); windowEnd++)
+    {
+        if (arr[windowEnd] == 1)
+        {
+            maxOnes++;
+        }
+
+        if (windowEnd - windowStart + 1 - maxOnes > k)
+        {
+            if (arr[windowStart] == 1)
+            {
+                maxOnes--;
+            }
+            windowStart++;
+        }
+
+        maxLen = max(maxLen, windowEnd - windowStart + 1);
+    }
+
+    return maxLen;
+}
+
+// Permutation in a String(hard)
+// Problem : Given a string and a pattern, find out if the string contains any permutation of the pattern.
+// Example 1
+// Input: String="oidbcaf", Pattern="abc"
+// Output: true
+// Explanation: The string contains "bca" which is a permutation of the given pattern.
+// Example 2
+// Input: String="odicf", Pattern="dc"
+// Output: false
+// Explanation: No permutation of the pattern is present in the given string as a substring.
+// Example 3
+// Input: String="bcdxabcdy", Pattern="bcdyabcdx"
+// Output: true
+// Explanation: Both the string and the pattern are a permutation of each other.
+// Example 4
+// Input: String="aaacb", Pattern="abc"
+// Output: true
+// Explanation: The string contains "acb" which is a permutation of the given pattern.
+static bool findPermutation(const string &str, const string &pattern)
+{
+    int windowStart = 0;
+    int matched = 0;
+    unordered_map<char, int> charCount;
+
+    // add in characters for permutation
+    for (auto chr : pattern)
+    {
+        charCount[chr]++;
+    }
+
+    // match all characters in charCount to get a permutation
+    for (int windowEnd = 0; windowEnd < str.size(); windowEnd++)
+    {
+        char rightChar = str[windowEnd];
+        if (charCount.find(rightChar) != charCount.end())
+        {
+            charCount[rightChar]--;
+            if (charCount[rightChar] == 0)
+            {
+                matched++;
+            }
+        }
+
+        // find a permutation
+        if (matched == charCount.size())
+        {
+            return true;
+        }
+
+        if (windowEnd >= pattern.size() - 1)
+        {
+            char leftChar = str[windowStart++];
+            // update the window
+            if (charCount.find(leftChar) != charCount.end())
+            {
+                // check to see if exiting character is part of the pattern
+                if (charCount[leftChar] == 0)
+                {
+                    matched--;
+                }
+                charCount[leftChar]++;
+            }
+        }
+    }
+}
+
+// String Anagrams(hard)
+// Problem : Given a string and a pattern, find all anagrams of the pattern in the given string.
+// Example 1
+// Input: String="ppqp", Pattern="pq"
+// Output: [1, 2]
+// Explanation: The two anagrams of the pattern in the given string are "pq" and "qp".
+// Example 2
+// Input: String="abbcabc", Pattern="abc"
+// Output: [2, 3, 4]
+// Explanation: The three anagrams of the pattern in the given string are "bca", "cab", and "abc".
+static vector<int> findStringAnagrams(const string &str, const string &pattern)
+{
+    int windowStart = 0;
+    int matched = 0;
+    unordered_map<char, int> charCount;
+    vector<int> result;
+
+    // add characters to map
+    for (auto chr : pattern)
+    {
+        charCount[chr]++;
+    }
+
+    for (int windowEnd = 0; windowEnd < str.size(); windowEnd++)
+    {
+        char rightChar = str[windowEnd];
+        if (charCount.find(rightChar) != charCount.end())
+        {
+            charCount[rightChar]--;
+            if (charCount[rightChar] == 0)
+            {
+                matched++;
+            }
+        }
+
+        if (matched == charCount.size())
+        {
+            result.push_back(windowStart);
+        }
+
+        if (windowEnd >= pattern.size() - 1)
+        {
+            char leftChar = str[windowStart++];
+            if (charCount.find(leftChar) != charCount.end())
+            {
+                if (charCount[leftChar] == 0)
+                {
+                    matched--;
+                }
+            }
+            charCount[leftChar]++;
+        }
+    }
+    return result;
+}
+
+// Smallest Window containing Substring(hard)
+// Problem : Given a string and a pattern, find the smallest substring in the given string which has all the character occurrences of the given pattern.
+// Example 1
+// Input: String="aabdec", Pattern="abc"
+// Output: "abdec"
+// Explanation: The smallest substring having all characters of the pattern is "abdec"
+// Example 2
+// Input: String="aabdec", Pattern="abac"
+// Output: "aabdec"
+// Explanation: The smallest substring having all character occurrences of the pattern is "aabdec"
+// Example 3
+// Input: String="abdbca", Pattern="abc"
+// Output: "bca"
+// Explanation: The smallest substring having all characters of the pattern is "bca".
+// Example 4
+// Input: String="adcad", Pattern="abc"
+// Output: ""
+// Explanation: No substring in the given string has all characters of the pattern.
+static string findSubstring(const string &str, const string &pattern)
+{
+    int windowStart = 0;
+    unordered_map<char, int> charCount;
+    // keep track of the starting index of the substring
+    int subStart = 0;
+    // keep track of the minimum length of the string
+    // initially set to the length of the string
+    int minLen = str.size() + 1;
+    // keep track of character matches
+    int matched = 0;
+
+    // populate map with pattern characters
+    for (auto chr : pattern)
+    {
+        charCount[chr]++;
+    }
+
+    // minimize string length to satisfy pattern constraint
+    for (int windowEnd = 0; windowEnd < str.size(); windowEnd++)
+    {
+        char rightChar = str[windowEnd];
+        if (charCount.find(rightChar) != charCount.end())
+        {
+            charCount[rightChar]--;
+            if (charCount[rightChar] >= 0)
+            {
+                matched++;
+            }
+        }
+
+        // shrink the window to get the minimum substring that contains the pattern
+        while (matched == pattern.size())
+        {
+            // update the start of the smallest minimum length and the start of the substring
+            if (minLen > windowEnd - windowStart + 1)
+            {
+                minLen = windowEnd - windowStart + 1;
+                subStart = windowStart;
+            }
+
+            char leftChar = str[windowStart++];
+            if (charCount.find(leftChar) != charCount.end())
+            {
+                if (charCount[leftChar] == 0)
+                {
+                    matched--;
+                }
+                charCount[leftChar]++;
+            }
+        }
+    }
+
+    return minLen > str.size() ? "" : str.substr(subStart, minLen);
+}

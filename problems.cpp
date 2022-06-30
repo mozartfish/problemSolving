@@ -116,3 +116,154 @@ static int findLength(const string &str)
     // TODO: Write your code here
     return maxLen;
 }
+
+// Longest Substring with Same Letters after Replacement(hard)
+// Given a string with lowercase letters only, if you are allowed to replace no more than k letters with any letter, find the length of the longest substring having the same letters after replacement.
+static int findLength(const string &str, int k)
+{
+    int maxLength = 0;
+    int windowStart = 0;
+    int maxRepeat = 0;
+    unordered_map<char, int> charCount;
+    for (int windowEnd = 0; windowEnd < str.size(); windowEnd++)
+    {
+        char rightChar = str[windowEnd];
+        charCount[rightChar]++;
+        maxRepeat = max(maxRepeat, charCount[rightChar]);
+        if (windowEnd - windowStart + 1 - maxRepeat > k)
+        {
+            char leftChar = str[windowStart];
+            charCount[leftChar]--;
+            windowStart++;
+        }
+
+        maxLength = max(maxLength, windowEnd - windowStart + 1);
+    }
+    // TODO: Write your code here
+    return maxLength;
+}
+
+// Longest Subarray with Ones after Replacement(hard)
+// Given an array containing 0s and 1s, if you are allowed to replace no more than ‘k’ 0s with 1s, find the length of the longest contiguous subarray having all 1s.
+static int findLength(const vector<int> &arr, int k)
+{
+    int maxLength = 0;
+    int maxOnes = 0;
+    int windowStart = 0;
+
+    for (int windowEnd = 0; windowEnd < arr.size(); windowEnd++)
+    {
+        if (arr[windowEnd] == 1)
+        {
+            maxOnes++;
+        }
+
+        if (windowEnd - windowStart + 1 - maxOnes > k)
+        {
+            if (arr[windowStart] == 1)
+            {
+                maxOnes--;
+            }
+            windowStart++;
+        }
+
+        maxLength = max(maxLength, windowEnd - windowStart + 1);
+    }
+    // TODO: Write your code here
+    return maxLength;
+}
+
+// Permutation in a String(hard)
+// Given a string and a pattern, find out if the string contains any permutation of the pattern.
+static bool findPermutation(const string &str, const string &pattern)
+{
+    int windowStart = 0;
+    int matched = 0;
+    unordered_map<char, int> charCount;
+    for (auto chr : pattern)
+    {
+        charCount[chr]++;
+    }
+
+    for (int windowEnd = 0; windowEnd < str.size(); windowEnd++)
+    {
+        char rightChar = str[windowEnd];
+        if (charCount.find(rightChar) != charCount.end())
+        {
+            charCount[rightChar]--;
+            if (charCount[rightChar] == 0)
+            {
+                matched++;
+            }
+        }
+
+        if (matched == charCount.size())
+        {
+            return true;
+        }
+
+        if (windowEnd >= pattern.size() - 1)
+        {
+            char leftChar = str[windowStart++];
+            if (charCount.find(leftChar) != charCount.end())
+            {
+                if (charCount[leftChar] == 0)
+                {
+                    matched--;
+                }
+                charCount[leftChar]++;
+            }
+        }
+    }
+    // TODO: Write your code here
+    return false;
+}
+
+// String Anagrams(hard)
+// Given a string and a pattern, find all anagrams of the pattern in the given string.
+static vector<int> findStringAnagrams(const string &str, const string &pattern)
+{
+    vector<int> resultIndices;
+    int windowStart = 0;
+    int matched = 0;
+    unordered_map<char, int> charCount;
+
+    // populate all the characters
+    for (auto chr : pattern)
+    {
+        charCount[chr]++;
+    }
+
+    for (int windowEnd = 0; windowEnd < str.size(); windowEnd++)
+    {
+        char rightChar = str[windowEnd];
+        if (charCount.find(rightChar) != charCount.end())
+        {
+            charCount[rightChar]--;
+            if (charCount[rightChar] == 0)
+            {
+                matched++;
+            }
+        }
+
+        if (matched == charCount.size())
+        {
+            resultIndices.push_back(windowStart);
+        }
+
+        if (windowEnd >= pattern.size() - 1)
+        {
+            char leftChar = str[windowStart++];
+            if (charCount.find(leftChar) != charCount.end())
+            {
+                if (charCount[leftChar] == 0)
+                {
+                    matched--;
+                }
+                charCount[leftChar]++;
+            }
+        }
+    }
+    // TODO: Write your code here
+    return resultIndices;
+}
