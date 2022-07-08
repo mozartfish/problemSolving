@@ -267,3 +267,57 @@ static vector<int> findStringAnagrams(const string &str, const string &pattern)
     // TODO: Write your code here
     return resultIndices;
 }
+
+// Words Concatenation(hard)
+static vector<int> findWordConcatenation(const string &str, const vector<string> &words)
+{
+    vector<int> result;
+    unordered_map<string, int> frequentWords;
+
+    // populate the frequent words
+    for (auto word : words)
+    {
+        frequentWords[word]++;
+    }
+
+    // number of words
+    int totalWords = words.size();
+    // size of a word
+    int wordLen = words[0].size();
+
+    // loop through by character
+    for (int i = 0; i <= str.size() - totalWords * wordLen; i++)
+    {
+        unordered_map<string, int> wordsSeen;
+
+        // loop through the words in the word list
+        for (int j = 0; j < totalWords; j++)
+        {
+            // find the index of the next word
+            int nextWordIndex = i + j * wordLen;
+
+            // find the current word
+            string currentWord = str.substr(nextWordIndex, wordLen);
+
+            // check if we need the word
+            if (frequentWords.find(currentWord) == frequentWords.end())
+            {
+                break;
+            }
+
+            wordsSeen[currentWord]++;
+
+            // check if wordCount is > frequent words
+            if (wordsSeen[currentWord] > frequentWords[currentWord])
+            {
+                break;
+            }
+
+            if (j + 1 == totalWords)
+            {
+                result.push_back(i);
+            }
+        }
+    }
+    return result;
+}

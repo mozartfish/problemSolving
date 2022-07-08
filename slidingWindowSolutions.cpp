@@ -461,3 +461,71 @@ static string findSubstring(const string &str, const string &pattern)
 
     return minLen > str.size() ? "" : str.substr(subStart, minLen);
 }
+
+// Words Concatenation(hard)
+// Given a string and a list of words, find all the starting indices of substrings in the given string that are a concatenation of all the given words exactly once without any overlapping of words.It is given that all words are of the same length.
+// Example 1
+// Input: String="catfoxcat", Words=["cat", "fox"]
+// Output: [0, 3]
+// Explanation: The two substring containing both the words are "catfox" & "foxcat".
+// Example 2
+// Input: String="catcatfoxfox", Words=["cat", "fox"]
+// Output: [3]
+// Explanation: The only substring containing both the words is "catfox".
+static vector<int> findWordConcatenation(const string &str, const vector<string> &words)
+{
+    // keep track of the frequency of every word in a dictionary
+    unordered_map<string, int> frequentWords;
+    for (string word : words)
+    {
+        frequentWords[word]++;
+    }
+
+    // result
+    vector<int> result;
+
+    // total number of words
+    int totalWords = words.size();
+
+    // the length of a word
+    int wordLen = words[0].size();
+
+    // loop through all the words in the sentence
+    for (int i = 0; i <= str.length() - totalWords * wordLen; i++)
+    {
+        // keep track of the words that we have seen so far
+        unordered_map<string, int> wordsSeen;
+        // loop through all the words that we are looking for
+        for (int j = 0; j < totalWords; j++)
+        {
+            // find the index of the next word based on its length
+            int nextWordIndex = i + j * wordLen;
+
+            // current word
+            string word = str.substr(nextWordIndex, wordLen);
+
+            // throw out words not in the words list
+            if (frequentWords.find(word) == frequentWords.end())
+            {
+                break;
+            }
+
+            // update the words seen
+            wordsSeen[word]++;
+
+            // if words in sentence is > words in words in word count skip
+            if (wordsSeen[word] > frequentWords[word])
+            {
+                break;
+            }
+
+            // store the index if we have found all the words
+            if (j + 1 == totalWords)
+            {
+                result.push_back(i);
+            }
+        }
+    }
+
+    return result;
+}
